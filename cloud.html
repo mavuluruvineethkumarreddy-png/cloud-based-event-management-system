@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventCloud - Cloud Event Management</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f7fb;
+    color: #1f2937;
+    transition: 0.3s;
+}
+
+body.dark {
+    background: #111827;
+    color: #f3f4f6;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* AUTH */
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+.auth-box {
+    width: 400px;
+    max-width: 92%;
+    background: white;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+}
+
+.auth-box h1 {
+    text-align: center;
+    color: #4f46e5;
+    margin-bottom: 10px;
+}
+
+.auth-box p {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+.password-box {
+    display: flex;
+}
+
+.password-box input {
+    border-radius: 8px 0 0 8px;
+}
+
+.password-box button {
+    width: 55px;
+    border: none;
+    background: #e5e7eb;
+    border-radius: 0 8px 8px 0;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.primary-btn:hover {
+    background: #3730a3;
+}
+
+.auth-link {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.auth-link span {
+    color: #4f46e5;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* APP */
+
+.navbar {
+    height: 65px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dark .navbar {
+    background: #1f2937;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.icon-btn {
+    border: none;
+    background: #eef2ff;
+    padding: 9px 12px;
+    border-radius: 8px;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 9px 15px;
+    border-radius: 8px;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+    width: 240px;
+    background: #111827;
+    color: white;
+    padding: 20px 12px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    background: transparent;
+    color: #d1d5db;
+    text-align: left;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    background: #4f46e5;
+    color: white;
+}
+
+.content {
+    flex: 1;
+    padding: 25px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.page-title {
+    margin-bottom: 20px;
+}
+
+.page-title h2 {
+    font-size: 28px;
+}
+
+.page-title p {
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+/* CARDS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+}
+
+.dark .stat-card,
+.dark .panel,
+.dark .event-card {
+    background: #1f2937;
+}
+
+.stat-card h3 {
+    font-size: 28px;
+    margin-top: 8px;
+}
+
+.stat-card p {
+    color: #6b7280;
+}
+
+.stat-icon {
+    font-size: 28px;
+}
+
+/* PANELS */
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+}
+
+.panel h3 {
+    margin-bottom: 15px;
+}
+
+/* EVENTS */
+
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.event-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+.event-image {
+    height: 130px;
+    background: linear-gradient(135deg,#4f46e5,#9333ea);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 42px;
+}
+
+.event-body {
+    padding: 18px;
+}
+
+.event-body h3 {
+    margin-bottom: 8px;
+}
+
+.event-info {
+    color: #6b7280;
+    font-size: 14px;
+    margin: 7px 0;
+}
+
+.event-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.small-btn {
+    padding: 9px 13px;
+    border: none;
+    border-radius: 7px;
+    background: #4f46e5;
+    color: white;
+}
+
+.delete-btn {
+    background: #ef4444;
+}
+
+/* FORMS */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* TABLE */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 13px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #f3f4f6;
+}
+
+.dark th {
+    background: #374151;
+}
+
+.badge {
+    padding: 5px 9px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.badge-green {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-blue {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* SEARCH */
+
+.search-box {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* PROFILE */
+
+.profile-box {
+    max-width: 700px;
+}
+
+.avatar {
+    width: 90px;
+    height: 90px;
+    background: #4f46e5;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+/* NOTIFICATION */
+
+.notification {
+    padding: 13px;
+    background: #eef2ff;
+    border-left: 4px solid #4f46e5;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px) {
+    .stats {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .event-grid {
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+@media(max-width:700px) {
+
+    .sidebar {
+        width: 65px;
+    }
+
+    .sidebar button {
+        font-size: 0;
+        text-align: center;
+    }
+
+    .sidebar button::first-letter {
+        font-size: 20px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .event-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginScreen" class="auth-container">
+
+<div class="auth-box">
+
+<h1>☁️ EventCloud</h1>
+<p>Cloud-Based Event Management System</p>
+
+<div class="input-group">
+<label>Email</label>
+<input type="email" id="loginEmail" placeholder="Enter email">
+</div>
+
+<div class="input-group">
+<label>Password</label>
+
+<div class="password-box">
+<input type="password" id="loginPassword" placeholder="Enter password">
+<button onclick="togglePassword('loginPassword')">👁</button>
+</div>
+
+</div>
+
+<button class="primary-btn" onclick="login()">Login</button>
+
+<div class="auth-link">
+Don't have an account?
+<span onclick="showSignup()">Sign Up</span>
+</div>
+
+<br>
+
+<center>
+<small>Demo: admin@eventcloud.com / admin123</small>
+</center>
+
+</div>
+</div>
+
+
+<!-- SIGNUP -->
+
+<div id="signupScreen" class="auth-container hidden">
+
+<div class="auth-box">
+
+<h1>☁️ EventCloud</h1>
+<p>Create your account</p>
+
+<div class="input-group">
+<label>Full Name</label>
+<input type="text" id="signupName" placeholder="Your name">
+</div>
+
+<div class="input-group">
+<label>Email</label>
+<input type="email" id="signupEmail" placeholder="Your email">
+</div>
+
+<div class="input-group">
+<label>Password</label>
+
+<div class="password-box">
+<input type="password" id="signupPassword" placeholder="Create password">
+<button onclick="togglePassword('signupPassword')">👁</button>
+</div>
+
+</div>
+
+<button class="primary-btn" onclick="signup()">Create Account</button>
+
+<div class="auth-link">
+Already have an account?
+<span onclick="showLogin()">Login</span>
+</div>
+
+</div>
+</div>
+
+
+<!-- APPLICATION -->
+
+<div id="application" class="hidden">
+
+<header class="navbar">
+
+<div class="logo">
+☁️ EventCloud
+</div>
+
+<div class="nav-actions">
+
+<button class="icon-btn" onclick="toggleDarkMode()">🌙</button>
+
+<button class="icon-btn" onclick="showPage('notifications')">
+🔔
+</button>
+
+<span id="navUser">Admin</span>
+
+<button class="logout-btn" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</header>
+
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<button onclick="showPage('dashboard')" class="active">
+🏠 Dashboard
+</button>
+
+<button onclick="showPage('events')">
+📅 Events
+</button>
+
+<button onclick="showPage('createEvent')">
+➕ Create Event
+</button>
+
+<button onclick="showPage('registrations')">
+🎟️ Registrations
+</button>
+
+<button onclick="showPage('notifications')">
+🔔 Notifications
+</button>
+
+<button onclick="showPage('profile')">
+👤 Profile
+</button>
+
+<button onclick="showPage('security')">
+🔐 Security
+</button>
+
+<button onclick="showPage('admin')">
+⚙️ Admin
+</button>
+
+</aside>
+
+
+<main class="content">
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="page active">
+
+<div class="page-title">
+<h2>Dashboard</h2>
+<p>Welcome back to your event management cloud.</p>
+</div>
+
+<div class="stats">
+
+<div class="stat-card">
+<div class="stat-icon">📅</div>
+<p>Total Events</p>
+<h3 id="totalEvents">0</h3>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">🎟️</div>
+<p>Registrations</p>
+<h3 id="totalRegistrations">0</h3>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">👥</div>
+<p>Users</p>
+<h3 id="totalUsers">0</h3>
+</div>
+
+<div class="stat-card">
+<div class="stat-icon">☁️</div>
+<p>Cloud Storage</p>
+<h3>82%</h3>
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>🚀 Latest Cloud Features</h3>
+
+<div class="notification">
+☁️ Cloud database synchronization enabled
+</div>
+
+<div class="notification">
+🤖 AI event recommendation engine available
+</div>
+
+<div class="notification">
+📊 Real-time event analytics enabled
+</div>
+
+<div class="notification">
+🔐 Secure authentication system enabled
+</div>
+
+<div class="notification">
+📱 Mobile responsive interface enabled
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Upcoming Events</h3>
+
+<div id="dashboardEvents" class="event-grid"></div>
+
+</div>
+
+</section>
+
+
+<!-- EVENTS -->
+
+<section id="events" class="page">
+
+<div class="page-title">
+<h2>Events</h2>
+<p>Browse and manage all events.</p>
+</div>
+
+<input
+class="search-box"
+id="eventSearch"
+placeholder="🔎 Search events..."
+onkeyup="renderEvents()"
+>
+
+<div id="eventGrid" class="event-grid"></div>
+
+</section>
+
+
+<!-- CREATE EVENT -->
+
+<section id="createEvent" class="page">
+
+<div class="page-title">
+<h2>Create Event</h2>
+<p>Create a new cloud event.</p>
+</div>
+
+<div class="panel">
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Event Name</label>
+<input id="eventName" placeholder="Example: Tech Conference 2026">
+</div>
+
+<div class="form-group">
+<label>Event Date</label>
+<input type="date" id="eventDate">
+</div>
+
+<div class="form-group">
+<label>Event Time</label>
+<input type="time" id="eventTime">
+</div>
+
+<div class="form-group">
+<label>Location</label>
+<input id="eventLocation" placeholder="Event location">
+</div>
+
+<div class="form-group">
+<label>Category</label>
+
+<select id="eventCategory">
+<option>Technology</option>
+<option>Education</option>
+<option>Business</option>
+<option>Entertainment</option>
+<option>Sports</option>
+<option>Workshop</option>
+</select>
+
+</div>
+
+<div class="form-group">
+<label>Maximum Seats</label>
+<input type="number" id="eventSeats" value="100">
+</div>
+
+<div class="form-group full">
+<label>Description</label>
+<textarea id="eventDescription"
+placeholder="Describe your event..."></textarea>
+</div>
+
+</div>
+
+<button class="primary-btn" onclick="createEvent()">
+Create Event
+</button>
+
+</div>
+
+</section>
+
+
+<!-- REGISTRATIONS -->
+
+<section id="registrations" class="page">
+
+<div class="page-title">
+<h2>Registrations</h2>
+<p>Manage event registrations.</p>
+</div>
+
+<div class="panel">
+
+<div class="table-container">
+
+<table>
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Event</th>
+<th>Status</th>
+<th>Date</th>
+</tr>
+</thead>
+
+<tbody id="registrationTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- NOTIFICATIONS -->
+
+<section id="notifications" class="page">
+
+<div class="page-title">
+
+<h2>Notifications</h2>
+
+<p>Latest system notifications.</p>
+
+</div>
+
+<div class="panel">
+
+<div class="notification">
+🔔 Your account was successfully logged in.
+</div>
+
+<div class="notification">
+📅 New technology events have been added.
+</div>
+
+<div class="notification">
+☁️ Cloud synchronization completed.
+</div>
+
+<div class="notification">
+🔐 Security check completed successfully.
+</div>
+
+<div class="notification">
+🎟️ Registration system is active.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- PROFILE -->
+
+<section id="profile" class="page">
+
+<div class="page-title">
+<h2>My Profile</h2>
+<p>Manage your account information.</p>
+</div>
+
+<div class="panel profile-box">
+
+<div class="avatar" id="profileAvatar">
+A
+</div>
+
+<div class="form-group">
+<label>Full Name</label>
+<input id="profileName">
+</div>
+
+<div class="form-group">
+<label>Email</label>
+<input id="profileEmail" disabled>
+</div>
+
+<button class="primary-btn" onclick="updateProfile()">
+Save Profile
+</button>
+
+</div>
+
+</section>
+
+
+<!-- SECURITY -->
+
+<section id="security" class="page">
+
+<div class="page-title">
+<h2>Security</h2>
+<p>Manage your account security.</p>
+</div>
+
+<div class="panel">
+
+<h3>Change Password</h3>
+
+<div class="form-group">
+<label>Current Password</label>
+<input type="password" id="currentPassword">
+</div>
+
+<div class="form-group">
+<label>New Password</label>
+<input type="password" id="newPassword">
+</div>
+
+<div class="form-group">
+<label>Confirm Password</label>
+<input type="password" id="confirmPassword">
+</div>
+
+<button class="primary-btn" onclick="changePassword()">
+Update Password
+</button>
+
+</div>
+
+
+<div class="panel">
+
+<h3>Security Status</h3>
+
+<div class="notification">
+🔐 Password protection: Active
+</div>
+
+<div class="notification">
+🛡️ Session protection: Active
+</div>
+
+<div class="notification">
+☁️ Cloud backup: Enabled
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="admin" class="page">
+
+<div class="page-title">
+
+<h2>Admin Dashboard</h2>
+
+<p>System administration and analytics.</p>
+
+</div>
+
+<div class="stats">
+
+<div class="stat-card">
+<p>Total Users</p>
+<h3 id="adminUsers">0</h3>
+</div>
+
+<div class="stat-card">
+<p>Total Events</p>
+<h3 id="adminEvents">0</h3>
+</div>
+
+<div class="stat-card">
+<p>Registrations</p>
+<h3 id="adminRegistrations">0</h3>
+</div>
+
+<div class="stat-card">
+<p>System Status</p>
+<h3>🟢 Online</h3>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h3>Cloud System Monitoring</h3>
+
+<div class="notification">
+☁️ Cloud server: Online
+</div>
+
+<div class="notification">
+🗄️ Database: Connected
+</div>
+
+<div class="notification">
+🔐 Authentication service: Active
+</div>
+
+<div class="notification">
+📊 Analytics service: Running
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* DEFAULT DATA */
+
+let users = JSON.parse(localStorage.getItem("eventUsers")) || [
+
+{
+name:"Admin",
+email:"admin@eventcloud.com",
+password:"admin123"
+}
+
+];
+
+let events = JSON.parse(localStorage.getItem("eventEvents")) || [
+
+{
+id:1,
+name:"Cloud Computing Summit",
+date:"2026-10-20",
+time:"10:00",
+location:"Hyderabad",
+category:"Technology",
+seats:200,
+description:"A conference about modern cloud computing technologies."
+},
+
+{
+id:2,
+name:"AI Innovation Workshop",
+date:"2026-10-25",
+time:"11:00",
+location:"Chennai",
+category:"Workshop",
+seats:100,
+description:"Learn about artificial intelligence and machine learning."
+},
+
+{
+id:3,
+name:"Startup Business Meet",
+date:"2026-11-05",
+time:"09:30",
+location:"Bangalore",
+category:"Business",
+seats:150,
+description:"Connect with entrepreneurs and startup founders."
+}
+
+];
+
+let registrations =
+JSON.parse(localStorage.getItem("eventRegistrations")) || [];
+
+let currentUser =
+JSON.parse(localStorage.getItem("eventCurrentUser")) || null;
+
+
+/* SAVE */
+
+function saveData() {
+
+localStorage.setItem(
+"eventUsers",
+JSON.stringify(users)
+);
+
+localStorage.setItem(
+"eventEvents",
+JSON.stringify(events)
+);
+
+localStorage.setItem(
+"eventRegistrations",
+JSON.stringify(registrations)
+);
+
+}
+
+
+/* PASSWORD */
+
+function togglePassword(id) {
+
+let input = document.getElementById(id);
+
+input.type =
+input.type === "password"
+? "text"
+: "password";
+
+}
+
+
+/* AUTH SCREENS */
+
+function showSignup() {
+
+document.getElementById("loginScreen")
+.classList.add("hidden");
+
+document.getElementById("signupScreen")
+.classList.remove("hidden");
+
+}
+
+
+function showLogin() {
+
+document.getElementById("signupScreen")
+.classList.add("hidden");
+
+document.getElementById("loginScreen")
+.classList.remove("hidden");
+
+}
+
+
+/* SIGNUP */
+
+function signup() {
+
+let name =
+document.getElementById("signupName").value.trim();
+
+let email =
+document.getElementById("signupEmail").value.trim();
+
+let password =
+document.getElementById("signupPassword").value;
+
+if(!name || !email || !password) {
+
+alert("Please fill all fields.");
+return;
+
+}
+
+if(password.length < 6) {
+
+alert("Password must contain at least 6 characters.");
+return;
+
+}
+
+if(users.some(u => u.email === email)) {
+
+alert("Email already registered.");
+return;
+
+}
+
+users.push({
+name,
+email,
+password
+});
+
+saveData();
+
+alert("Account created successfully!");
+
+showLogin();
+
+}
+
+
+/* LOGIN */
+
+function login() {
+
+let email =
+document.getElementById("loginEmail").value.trim();
+
+let password =
+document.getElementById("loginPassword").value;
+
+let user =
+users.find(
+u => u.email === email &&
+u.password === password
+);
+
+if(!user) {
+
+alert("Invalid email or password.");
+return;
+
+}
+
+currentUser = user;
+
+localStorage.setItem(
+"eventCurrentUser",
+JSON.stringify(user)
+);
+
+openApplication();
+
+}
+
+
+/* OPEN APP */
+
+function openApplication() {
+
+document.getElementById("loginScreen")
+.classList.add("hidden");
+
+document.getElementById("signupScreen")
+.classList.add("hidden");
+
+document.getElementById("application")
+.classList.remove("hidden");
+
+document.getElementById("navUser").textContent =
+currentUser.name;
+
+loadProfile();
+
+updateDashboard();
+
+renderEvents();
+
+renderRegistrations();
+
+}
+
+
+/* LOGOUT */
+
+function logout() {
+
+localStorage.removeItem("eventCurrentUser");
+
+currentUser = null;
+
+document.getElementById("application")
+.classList.add("hidden");
+
+document.getElementById("loginScreen")
+.classList.remove("hidden");
+
+}
+
+
+/* PAGE NAVIGATION */
+
+function showPage(pageId) {
+
+document.querySelectorAll(".page")
+.forEach(page => {
+page.classList.remove("active");
+});
+
+document.getElementById(pageId)
+.classList.add("active");
+
+document.querySelectorAll(".sidebar button")
+.forEach(btn => {
+btn.classList.remove("active");
+});
+
+}
+
+
+/* CREATE EVENT */
+
+function createEvent() {
+
+let name =
+document.getElementById("eventName").value.trim();
+
+let date =
+document.getElementById("eventDate").value;
+
+let time =
+document.getElementById("eventTime").value;
+
+let location =
+document.getElementById("eventLocation").value.trim();
+
+let category =
+document.getElementById("eventCategory").value;
+
+let seats =
+document.getElementById("eventSeats").value;
+
+let description =
+document.getElementById("eventDescription").value.trim();
+
+if(!name || !date || !time || !location) {
+
+alert("Please complete all required fields.");
+return;
+
+}
+
+events.push({
+
+id:Date.now(),
+
+name,
+
+date,
+
+time,
+
+location,
+
+category,
+
+seats,
+
+description
+
+});
+
+saveData();
+
+alert("Event created successfully!");
+
+document.getElementById("eventName").value="";
+document.getElementById("eventDate").value="";
+document.getElementById("eventTime").value="";
+document.getElementById("eventLocation").value="";
+document.getElementById("eventDescription").value="";
+
+updateDashboard();
+
+renderEvents();
+
+showPage("events");
+
+}
+
+
+/* RENDER EVENTS */
+
+function renderEvents() {
+
+let grid =
+document.getElementById("eventGrid");
+
+if(!grid) return;
+
+let search =
+document.getElementById("eventSearch")
+?.value.toLowerCase() || "";
+
+let filtered =
+events.filter(e =>
+e.name.toLowerCase().includes(search) ||
+e.category.toLowerCase().includes(search) ||
+e.location.toLowerCase().includes(search)
+);
+
+grid.innerHTML="";
+
+filtered.forEach(event => {
+
+let card = document.createElement("div");
+
+card.className="event-card";
+
+card.innerHTML=`
+
+<div class="event-image">
+📅
+</div>
+
+<div class="event-body">
+
+<h3>${event.name}</h3>
+
+<div class="event-info">
+📆 ${event.date}
+</div>
+
+<div class="event-info">
+⏰ ${event.time}
+</div>
+
+<div class="event-info">
+📍 ${event.location}
+</div>
+
+<div class="event-info">
+🏷️ ${event.category}
+</div>
+
+<p>${event.description}</p>
+
+<div class="event-actions">
+
+<button
+class="small-btn"
+onclick="registerEvent(${event.id})">
+Register
+</button>
+
+<button
+class="small-btn delete-btn"
+onclick="deleteEvent(${event.id})">
+Delete
+</button>
+
+</div>
+
+</div>
+`;
+
+grid.appendChild(card);
+
+});
+
+}
+
+
+/* REGISTER */
+
+function registerEvent(id) {
+
+let event =
+events.find(e => e.id === id);
+
+if(!event) return;
+
+let already =
+registrations.some(
+r =>
+r.eventId === id &&
+r.email === currentUser.email
+);
+
+if(already) {
+
+alert("You are already registered for this event.");
+return;
+
+}
+
+registrations.push({
+
+id:Date.now(),
+
+name:currentUser.name,
+
+email:currentUser.email,
+
+eventId:id,
+
+event:event.name,
+
+status:"Confirmed",
+
+date:new Date().toLocaleDateString()
+
+});
+
+saveData();
+
+alert("Successfully registered!");
+
+renderRegistrations();
+
+updateDashboard();
+
+}
+
+
+/* DELETE */
+
+function deleteEvent(id) {
+
+if(!confirm("Delete this event?")) return;
+
+events =
+events.filter(e => e.id !== id);
+
+registrations =
+registrations.filter(r => r.eventId !== id);
+
+saveData();
+
+renderEvents();
+
+renderRegistrations();
+
+updateDashboard();
+
+}
+
+
+/* REGISTRATION TABLE */
+
+function renderRegistrations() {
+
+let table =
+document.getElementById("registrationTable");
+
+if(!table) return;
+
+table.innerHTML="";
+
+registrations.forEach(r => {
+
+let row =
+document.createElement("tr");
+
+row.innerHTML=`
+
+<td>${r.name}</td>
+
+<td>${r.email}</td>
+
+<td>${r.event}</td>
+
+<td>
+<span class="badge badge-green">
+${r.status}
+</span>
+</td>
+
+<td>${r.date}</td>
+
+`;
+
+table.appendChild(row);
+
+});
+
+}
+
+
+/* DASHBOARD */
+
+function updateDashboard() {
+
+document.getElementById("totalEvents")
+.textContent = events.length;
+
+document.getElementById("totalRegistrations")
+.textContent = registrations.length;
+
+document.getElementById("totalUsers")
+.textContent = users.length;
+
+document.getElementById("adminUsers")
+.textContent = users.length;
+
+document.getElementById("adminEvents")
+.textContent = events.length;
+
+document.getElementById("adminRegistrations")
+.textContent =
+registrations.length;
+
+let container =
+document.getElementById("dashboardEvents");
+
+if(container) {
+
+container.innerHTML="";
+
+events.slice(0,3).forEach(event => {
+
+let card =
+document.createElement("div");
+
+card.className="event-card";
+
+card.innerHTML=`
+
+<div class="event-image">
+🎉
+</div>
+
+<div class="event-body">
+
+<h3>${event.name}</h3>
+
+<div class="event-info">
+📆 ${event.date}
+</div>
+
+<div class="event-info">
+📍 ${event.location}
+</div>
+
+<p>${event.description}</p>
+
+</div>
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+}
+
+
+/* PROFILE */
+
+function loadProfile() {
+
+document.getElementById("profileName")
+.value=currentUser.name;
+
+document.getElementById("profileEmail")
+.value=currentUser.email;
+
+document.getElementById("profileAvatar")
+.textContent =
+currentUser.name.charAt(0).toUpperCase();
+
+}
+
+
+function updateProfile() {
+
+let name =
+document.getElementById("profileName").value.trim();
+
+if(!name) {
+
+alert("Name cannot be empty.");
+return;
+
+}
+
+let user =
+users.find(u =>
+u.email === currentUser.email
+);
+
+user.name=name;
+
+currentUser=user;
+
+localStorage.setItem(
+"eventCurrentUser",
+JSON.stringify(user)
+);
+
+saveData();
+
+document.getElementById("navUser")
+.textContent=name;
+
+document.getElementById("profileAvatar")
+.textContent =
+name.charAt(0).toUpperCase();
+
+alert("Profile updated successfully!");
+
+}
+
+
+/* CHANGE PASSWORD */
+
+function changePassword() {
+
+let current =
+document.getElementById("currentPassword").value;
+
+let newPassword =
+document.getElementById("newPassword").value;
+
+let confirm =
+document.getElementById("confirmPassword").value;
+
+if(current !== currentUser.password) {
+
+alert("Current password is incorrect.");
+return;
+
+}
+
+if(newPassword.length < 6) {
+
+alert("New password must contain at least 6 characters.");
+return;
+
+}
+
+if(newPassword !== confirm) {
+
+alert("Passwords do not match.");
+return;
+
+}
+
+let user =
+users.find(u =>
+u.email === currentUser.email
+);
+
+user.password=newPassword;
+
+currentUser=user;
+
+saveData();
+
+localStorage.setItem(
+"eventCurrentUser",
+JSON.stringify(user)
+);
+
+alert("Password changed successfully!");
+
+document.getElementById("currentPassword").value="";
+document.getElementById("newPassword").value="";
+document.getElementById("confirmPassword").value="";
+
+}
+
+
+/* DARK MODE */
+
+function toggleDarkMode() {
+
+document.body.classList.toggle("dark");
+
+localStorage.setItem(
+"eventDarkMode",
+document.body.classList.contains("dark")
+);
+
+}
+
+
+/* LOAD DARK MODE */
+
+if(localStorage.getItem("eventDarkMode") === "true") {
+
+document.body.classList.add("dark");
+
+}
+
+
+/* AUTO LOGIN */
+
+if(currentUser) {
+
+openApplication();
+
+}
+
+</script>
+
+</body>
+</html>
